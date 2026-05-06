@@ -9,7 +9,7 @@ import os
 from loguru import logger
 from crewai import Agent
 from langchain.tools import tool
-from langchain_community.chat_models import ChatOpenAI
+from inference.rocm_client import chat_completion_sync
 
 VLLM_BASE_URL = os.getenv("VLLM_BASE_URL", "http://localhost:8080/v1")
 VLLM_MODEL = os.getenv("VLLM_MODEL", "deepseek-ai/DeepSeek-R1-Distill-Llama-70B")
@@ -28,34 +28,38 @@ Given a normalised security event, respond ONLY with a JSON object containing:
 Respond ONLY with valid JSON. No preamble, no markdown fences."""
 
 
-def get_llm():
-    """Return a LangChain LLM pointing at vLLM/AMD Developer Cloud."""
-    return ChatOpenAI(
-        base_url=VLLM_BASE_URL,
-        api_key=os.getenv("AMD_CLOUD_API_KEY", "EMPTY"),
-        model=VLLM_MODEL,
-        temperature=0.1,
-        max_tokens=512,
-    )
-
-
 def classify_event(event: dict) -> dict:
-    """Run the LLM classifier on a single event dict."""
-    llm = get_llm()
+    """Run the LLM classifier on a single event dict using ROCm client."""
     prompt = f"Classify this security event:\n\n{json.dumps(event, indent=2)}"
-    from langchain.schema import HumanMessage, SystemMessage
-    response = llm.invoke([
-        SystemMessage(content=CLASSIFIER_SYSTEM_PROMPT),
-        HumanMessage(content=prompt),
-    ])
+    messages = [
+        {"role": "system", "content": CLASSIFIER_SYSTEM_PROMPT},
+        {"role": "user", "content": prompt}
+    ]
+    
     try:
-        classification = json.loads(response.content)
-    except json.JSONDecodeError:
+        response_content = chat_completion_sync(
+            messages=messages,
+            model=VLLM_MODEL,
+            temperature=0.1,
+            max_tokens=512
+        )
+        # Parse output ensuring no markdown fences
+        clean_content = response_content.strip()
+        if clean_content.startswith("```json"):
+            clean_content = clean_content[7:]
+        if clean_content.startswith("```"):
+            clean_content = clean_content[3:]
+        if clean_content.endswith("```"):
+            clean_content = clean_content[:-3]
+            
+        classification = json.loads(clean_content.strip())
+    except Exception as e:
+        logger.warning(f"Classification failed: {e}")
         classification = {
             "severity": "UNKNOWN",
             "confidence": 0,
-            "reasoning": "LLM returned non-JSON response.",
-            "raw_response": response.content,
+            "reasoning": "LLM returned non-JSON response or request failed.",
+            "raw_response": str(e),
         }
     return {**event, "classification": classification}
 

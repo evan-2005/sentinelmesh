@@ -113,6 +113,44 @@ def batch_parse_logs(log_lines: str) -> str:
     return f"Parsed {ok} events OK, {fail} failed. Published to {TOPIC_RAW}."
 
 
+def start_syslog_stream():
+    """Start listening to the live Kafka syslog stream in a background thread."""
+    def consume():
+        from kafka import KafkaConsumer
+        syslog_topic = os.getenv("KAFKA_TOPIC_SYSLOG", "syslog")
+        import time
+        while True:
+            try:
+                consumer = KafkaConsumer(
+                    syslog_topic,
+                    bootstrap_servers=KAFKA_BOOTSTRAP,
+                    auto_offset_reset='earliest',
+                    group_id='log_harvester_group',
+                    value_deserializer=lambda m: m.decode('utf-8', errors='ignore')
+                )
+                producer = get_producer()
+                logger.info(f"Started consuming live syslog stream from {syslog_topic}")
+                for message in consumer:
+                    event = normalise(message.value)
+                    if event:
+                        producer.send(TOPIC_RAW, event)
+                        producer.flush()
+            except Exception as e:
+                logger.error(f"Error in syslog consumer: {e}. Retrying in 5s...")
+                time.sleep(5)
+
+    import threading
+    t = threading.Thread(target=consume, daemon=True)
+    t.start()
+    return "Started live syslog stream consumption in background."
+
+
+@tool("start_live_syslog_ingest")
+def start_live_syslog_ingest(dummy: str) -> str:
+    """Connect to the live Kafka syslog stream and ingest logs continuously."""
+    return start_syslog_stream()
+
+
 log_harvester_agent = Agent(
     role="Log Harvester",
     goal="Ingest, parse, and normalise all incoming log streams into structured security events.",
@@ -120,7 +158,7 @@ log_harvester_agent = Agent(
         "You are a log parsing specialist with deep knowledge of syslog, CEF, "
         "and JSON formats. You output clean, structured events ready for AI analysis."
     ),
-    tools=[parse_and_publish_log, batch_parse_logs],
+    tools=[parse_and_publish_log, batch_parse_logs, start_live_syslog_ingest],
     verbose=True,
     allow_delegation=False,
 )

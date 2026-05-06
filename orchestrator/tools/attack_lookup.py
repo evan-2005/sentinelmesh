@@ -1,40 +1,53 @@
 """MITRE ATT&CK STIX lookup tool."""
 from langchain.tools import tool
+from stix2 import TAXIICollectionSource, Filter
+from taxii2client.v20 import Collection
 
-# Lightweight static map of common techniques.
-# TODO: replace with full STIX dataset query via taxii2-client.
-ATTACK_MAP = {
-    "T1557": {"name": "Adversary-in-the-Middle", "tactic": "Credential Access", "url": "https://attack.mitre.org/techniques/T1557/"},
-    "T1048": {"name": "Exfiltration Over Alternative Protocol", "tactic": "Exfiltration", "url": "https://attack.mitre.org/techniques/T1048/"},
-    "T1548": {"name": "Abuse Elevation Control Mechanism", "tactic": "Privilege Escalation", "url": "https://attack.mitre.org/techniques/T1548/"},
-    "T1078": {"name": "Valid Accounts", "tactic": "Initial Access", "url": "https://attack.mitre.org/techniques/T1078/"},
-    "T1595": {"name": "Active Scanning", "tactic": "Reconnaissance", "url": "https://attack.mitre.org/techniques/T1595/"},
-    "T1110": {"name": "Brute Force", "tactic": "Credential Access", "url": "https://attack.mitre.org/techniques/T1110/"},
-    "T1021": {"name": "Remote Services", "tactic": "Lateral Movement", "url": "https://attack.mitre.org/techniques/T1021/"},
-}
-
+# Connect to MITRE Enterprise ATT&CK collection
+collection = Collection("https://cti-taxii.mitre.org/stix/collections/95ecc380-afe9-11e4-9b6c-751b66dd541e/")
+src = TAXIICollectionSource(collection)
 
 @tool("attack_technique_lookup")
 def attack_technique_lookup(technique_id: str) -> str:
     """
-    Look up a MITRE ATT&CK technique by ID (e.g. T1557).
-    Returns the technique name, tactic, and ATT&CK URL.
+    Look up a MITRE ATT&CK technique by ID (e.g. T1557) via a STIX TAXII feed.
     """
-    info = ATTACK_MAP.get(technique_id.upper())
-    if not info:
-        return f"Technique {technique_id} not found in local map. Check https://attack.mitre.org/techniques/{technique_id}/"
-    return (
-        f"Technique: {technique_id} — {info['name']} | "
-        f"Tactic: {info['tactic']} | "
-        f"Reference: {info['url']}"
-    )
-
+    try:
+        filt = [Filter('type', '=', 'attack-pattern'), Filter('external_references.external_id', '=', technique_id.upper())]
+        results = src.query(filt)
+        if not results:
+            return f"Technique {technique_id} not found in STIX dataset. Check https://attack.mitre.org/techniques/{technique_id}/"
+            
+        tech = results[0]
+        tactics = [phase.phase_name for phase in tech.get('kill_chain_phases', [])]
+        tactic_str = ", ".join(tactics) if tactics else "Unknown"
+        ref_url = tech.get("external_references", [{}])[0].get("url", f"https://attack.mitre.org/techniques/{technique_id.upper()}/")
+        
+        return (
+            f"Technique: {technique_id.upper()} — {tech.name} | "
+            f"Tactic: {tactic_str} | "
+            f"Reference: {ref_url}"
+        )
+    except Exception as e:
+        return f"Error querying STIX feed: {e}"
 
 @tool("search_attack_by_tactic")
 def search_attack_by_tactic(tactic_name: str) -> str:
-    """Return all known techniques for a given ATT&CK tactic name."""
-    matches = {k: v for k, v in ATTACK_MAP.items() if tactic_name.lower() in v["tactic"].lower()}
-    if not matches:
-        return f"No techniques found for tactic: {tactic_name}"
-    lines = [f"{k}: {v['name']}" for k, v in matches.items()]
-    return "\n".join(lines)
+    """Return all known techniques for a given ATT&CK tactic name, using STIX TAXII feed."""
+    try:
+        filt = [Filter('type', '=', 'attack-pattern'), Filter('kill_chain_phases.phase_name', '=', tactic_name.lower().replace(" ", "-"))]
+        results = src.query(filt)
+        if not results:
+            return f"No techniques found for tactic: {tactic_name}"
+            
+        lines = []
+        for tech in results:
+            ext_id = "Unknown"
+            for ref in tech.get('external_references', []):
+                if ref.source_name == 'mitre-attack':
+                    ext_id = ref.external_id
+                    break
+            lines.append(f"{ext_id}: {tech.name}")
+        return "\n".join(lines)
+    except Exception as e:
+        return f"Error querying STIX feed: {e}"
