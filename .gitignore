@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Env
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# Data
+*.log
+data/live_logs/
+
+# Node
+node_modules/
+frontend/dist/
+frontend/.next/
