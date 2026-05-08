@@ -8,7 +8,7 @@ Built for the **AMD Developer Hackathon** · Track 1: AI Agents & Agentic Workfl
 
 ## 📸 Platform Screenshots
 
-> **[PLACEHOLDER_SCREENSHOT_1: Replace this line with a screenshot of the main "Mesh Agents" view showing the telemetry grid]**
+> **sentinelmesh ss/WhatsApp Image 2026-05-08 at 12.28.03 PM.jpeg**
 > *The central SOC platform tracking node telemetry and DeepSeek-R1 logic on AMD MI300X.*
 
 > **[PLACEHOLDER_SCREENSHOT_2: Replace this line with a screenshot of the "Live Log Explorer" view]**
