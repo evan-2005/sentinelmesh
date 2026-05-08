@@ -1,12 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
 :root {
-  --bg-base: #09090b;
-  --bg-surface: #18181b;
-  --bg-surface-hover: #27272a;
-  --border-dim: #27272a;
-  --border-focus: #3f3f46;
-  --text-main: #e4e4e7;
+  --bg-base: #000000;
+  --bg-surface: #111111;
+  --bg-surface-hover: #1a1a1a;
+  --border-dim: #222222;
+  --border-focus: #333333;
+  --text-main: #f4f4f5;
   --text-muted: #a1a1aa;
   
   --system-cyan: #06b6d4;
@@ -67,22 +67,27 @@ body {
   padding: 1rem 0;
 }
 
-.sidebar-nav a {
+.sidebar-nav button {
+  appearance: none;
+  background: transparent;
+  border: none;
+  text-align: left;
   padding: 0.75rem 1.5rem;
   color: var(--text-muted);
-  text-decoration: none;
+  font-family: 'Inter', sans-serif;
   font-size: 0.85rem;
   font-weight: 500;
   transition: all 0.2s;
   border-left: 2px solid transparent;
+  cursor: pointer;
 }
 
-.sidebar-nav a:hover {
+.sidebar-nav button:hover {
   background-color: var(--bg-surface);
   color: var(--text-main);
 }
 
-.sidebar-nav a.active {
+.sidebar-nav button.active {
   background-color: rgba(6, 182, 212, 0.05);
   color: var(--system-cyan);
   border-left-color: var(--system-cyan);
@@ -98,7 +103,7 @@ body {
 }
 
 .topbar {
-  height: 56px;
+  min-height: 56px;
   border-bottom: 1px solid var(--border-dim);
   display: flex;
   justify-content: space-between;
@@ -151,7 +156,7 @@ body {
 /* Content Area */
 .content {
   flex: 1;
-  padding: 2rem;
+  padding: 2.5rem 3rem;
   overflow-y: auto;
 }
 
@@ -164,7 +169,7 @@ body {
 
 .section-header h3 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 500;
   color: var(--text-main);
 }
@@ -174,11 +179,144 @@ body {
   color: var(--text-muted);
 }
 
+.blink {
+  animation: txt-blink 2s infinite;
+}
+@keyframes txt-blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
 .system-loading {
   font-family: 'JetBrains Mono', monospace;
   color: var(--system-amber);
   font-size: 0.9rem;
   margin-top: 2rem;
+}
+
+/* RIBBON */
+.info-ribbon {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.ribbon-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-dim);
+  padding: 1.5rem;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ribbon-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.5px;
+}
+
+.ribbon-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+.ribbon-value.pending { color: var(--system-amber); }
+.ribbon-value.success { color: var(--system-green); }
+
+
+/* DATA TABLE */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-dim);
+}
+
+.data-table th, .data-table td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-dim);
+  text-align: left;
+}
+
+.data-table th {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  background-color: #0b0b0b;
+}
+
+.data-table td {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+}
+
+.data-table tr:hover {
+  background-color: var(--border-dim);
+}
+
+.sev-badge {
+  padding: 0.2rem 0.5rem;
+  border-radius: 2px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.sev-badge.critical { background: rgba(239, 68, 68, 0.15); color: var(--system-red); border: 1px solid rgba(239, 68, 68, 0.3); }
+.sev-badge.high { background: rgba(245, 158, 11, 0.15); color: var(--system-amber); border: 1px solid rgba(245, 158, 11, 0.3); }
+.sev-badge.medium { background: rgba(6, 182, 212, 0.15); color: var(--system-cyan); border: 1px solid rgba(6, 182, 212, 0.3); }
+.sev-badge.low { background: rgba(161, 161, 170, 0.15); color: var(--text-muted); border: 1px solid rgba(161, 161, 170, 0.3); }
+
+.ip-text { color: var(--system-cyan); }
+
+.btn-action {
+  background: transparent;
+  color: var(--text-main);
+  border: 1px solid var(--border-focus);
+  padding: 0.4rem 0.8rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-action:hover {
+  background: var(--border-focus);
+}
+
+
+/* TERMINAL SEC */
+.terminal-box {
+  background-color: #030303;
+  border: 1px solid var(--border-dim);
+  padding: 1.5rem;
+  height: 500px;
+  border-radius: 4px;
+  overflow-y: scroll;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: #10b981; 
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.terminal-box .line {
+  word-wrap: break-word;
+  line-height: 1.4;
 }
 
 /* Telemetry Grid */
@@ -201,14 +339,8 @@ body {
   border-color: var(--border-focus);
 }
 
-/* Hard straight top-lines for states */
-.node-panel.busy {
-  border-top: 2px solid var(--system-cyan);
-}
-
-.node-panel.active {
-  border-top: 2px solid var(--system-green);
-}
+.node-panel.busy { border-top: 2px solid var(--system-cyan); }
+.node-panel.active { border-top: 2px solid var(--system-green); }
 
 .panel-header {
   padding: 1rem 1.25rem;
@@ -242,16 +374,8 @@ body {
   letter-spacing: 0.5px;
 }
 
-.status-badge.busy {
-  background-color: rgba(6, 182, 212, 0.1);
-  color: var(--system-cyan);
-  border: 1px solid rgba(6, 182, 212, 0.2);
-}
-.status-badge.active {
-  background-color: rgba(16, 185, 129, 0.1);
-  color: var(--system-green);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-}
+.status-badge.busy { background-color: rgba(6, 182, 212, 0.1); color: var(--system-cyan); border: 1px solid rgba(6, 182, 212, 0.2); }
+.status-badge.active { background-color: rgba(16, 185, 129, 0.1); color: var(--system-green); border: 1px solid rgba(16, 185, 129, 0.2); }
 
 .panel-body {
   padding: 1.25rem;
@@ -326,7 +450,6 @@ body {
   line-height: 1.4;
 }
 
-/* Smooth initial setup */
 .node-panel {
   animation: fadeIn 0.3s ease-out;
 }
