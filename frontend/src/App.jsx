@@ -10,8 +10,9 @@ export default function App() {
     const fetchAgents = async () => {
       try {
         const res = await fetch(`${API}/agents`);
+        if (!res.ok) throw new Error("API not reachable");
         const data = await res.json();
-        setAgents(data);
+        setAgents(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Failed to fetch agents", err);
       }

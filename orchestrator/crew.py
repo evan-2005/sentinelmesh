@@ -5,6 +5,10 @@ continuous pipeline: ingest -> classify -> correlate -> report.
 """
 import json
 import os
+
+# Polyfill OpenAI requirements for CrewAI to use AMD vLLM directly
+os.environ["OPENAI_API_KEY"] = "dummy"
+os.environ["OPENAI_API_BASE"] = os.environ.get("VLLM_BASE_URL", "http://localhost:8080/v1")
 from crewai import Crew, Task
 from agents.log_harvester import log_harvester_agent
 from agents.threat_classifier import threat_classifier_agent
