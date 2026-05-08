@@ -8,14 +8,17 @@ Built for the **AMD Developer Hackathon** · Track 1: AI Agents & Agentic Workfl
 
 ## 📸 Platform Screenshots
 
-> **sentinelmesh ss/WhatsApp Image 2026-05-08 at 12.28.03 PM.jpeg **
-> *The central SOC platform tracking node telemetry and DeepSeek-R1 logic on AMD MI300X.*
+![Active Mesh Agents](sentinelmesh%20ss/activemeshagents.jpeg)
+*The central SOC platform tracking node telemetry and DeepSeek-R1 logic on AMD MI300X.*
 
-> **[PLACEHOLDER_SCREENSHOT_2: Replace this line with a screenshot of the "Live Log Explorer" view]**
-> *Live terminal output showing CrewAI orchestrated models parsing Kafka Event streams natively.*
+![Live Raw Stream](sentinelmesh%20ss/liverawstream.jpeg)
+*Live terminal output showing CrewAI orchestrated models parsing Kafka Event streams natively.*
 
-> **[PLACEHOLDER_SCREENSHOT_3: Replace this line with a screenshot of the "Incidents" data table]**
-> *Correlated kill chains and output analysis parsed safely into tactical alerts.*
+![Incident Tracker](sentinelmesh%20ss/incedenttracker.jpeg)
+*Correlated kill chains and output analysis parsed safely into tactical alerts.*
+
+![Threat Topology](sentinelmesh%20ss/threattopologymap.jpeg)
+*Real-time C2 Kill Chain mapping using LLM confidence scoring.*
 
 ---
 
