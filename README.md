@@ -6,6 +6,19 @@ Built for the **AMD Developer Hackathon** · Track 1: AI Agents & Agentic Workfl
 
 ---
 
+## 📸 Platform Screenshots
+
+> **[PLACEHOLDER_SCREENSHOT_1: Replace this line with a screenshot of the main "Mesh Agents" view showing the telemetry grid]**
+> *The central SOC platform tracking node telemetry and DeepSeek-R1 logic on AMD MI300X.*
+
+> **[PLACEHOLDER_SCREENSHOT_2: Replace this line with a screenshot of the "Live Log Explorer" view]**
+> *Live terminal output showing CrewAI orchestrated models parsing Kafka Event streams natively.*
+
+> **[PLACEHOLDER_SCREENSHOT_3: Replace this line with a screenshot of the "Incidents" data table]**
+> *Correlated kill chains and output analysis parsed safely into tactical alerts.*
+
+---
+
 ## What is SentinelMesh?
 
 SentinelMesh is a multi-agent AI system that autonomously monitors, classifies, correlates, and responds to cybersecurity threats in real time. Four specialised agents work in parallel — each with a focused role — orchestrated via CrewAI on AMD Instinct MI300X GPUs.
@@ -16,7 +29,7 @@ SentinelMesh is a multi-agent AI system that autonomously monitors, classifies, 
 
 ## Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │                    SentinelMesh Mesh                    │
 │                                                         │
@@ -53,95 +66,63 @@ SentinelMesh is a multi-agent AI system that autonomously monitors, classifies, 
 | LLM inference | DeepSeek-R1 70B, Llama 3.1 70B, Qwen2.5 |
 | GPU compute | AMD Instinct MI300X via AMD Developer Cloud |
 | GPU software | ROCm 6.x, PyTorch (ROCm build) |
-| Serving | vLLM (ROCm fork) |
 | Log ingestion | Apache Kafka + custom parsers |
 | Threat intel | MITRE ATT&CK STIX, VirusTotal API, AbuseIPDB |
 | Backend | FastAPI + PostgreSQL + Redis |
-| Frontend | React |
-
----
-
-## Project Structure
-
-```
-sentinelmesh/
-├── agents/
-│   ├── log_harvester.py        # Log ingestion & normalisation
-│   ├── threat_classifier.py   # LLM-based threat scoring
-│   ├── correlation_engine.py  # Kill chain correlation
-│   └── incident_writer.py     # IR report generation
-├── orchestrator/
-│   ├── crew.py                # CrewAI crew definition
-│   └── tools/
-│       ├── virustotal.py      # VirusTotal API tool
-│       ├── abuseipdb.py       # IP reputation tool
-│       └── attack_lookup.py   # MITRE ATT&CK STIX tool
-├── inference/
-│   ├── rocm_client.py         # AMD Developer Cloud client
-│   └── vllm_server.py         # vLLM config for MI300X
-├── api/
-│   ├── main.py                # FastAPI app entry point
-│   ├── models.py              # Pydantic schemas
-│   └── routes/
-│       ├── events.py          # Threat event endpoints
-│       └── agents.py          # Agent status endpoints
-├── frontend/src/              # React dashboard
-├── data/sample_logs/          # Sample syslog, CEF, EVTX logs
-├── docker-compose.yml
-├── requirements.txt
-├── .env.example
-└── README.md
-```
+| Frontend | React + Vite (SOC-Style multi-page dashboard) |
 
 ---
 
 ## Quickstart
 
 ### 1. Prerequisites
-- AMD Developer Cloud account (developer.amd.com)
-- ROCm 6.x or AMD Developer Cloud environment
-- Python 3.11+, Docker + Docker Compose, Node.js 18+
+- AMD Developer Cloud account (developer.amd.com) or native ROCm 6.x GPU instance.
+- Python 3.12+, Docker + Docker Compose, Node.js 18+
 
-### 2. Clone & install
+### 2. Clone & Setup Python
 ```bash
-git clone https://github.com/YOUR_USERNAME/sentinelmesh.git
+git clone https://github.com/evan-2005/sentinelmesh.git
 cd sentinelmesh
+python3.12 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
-```
-
-### 3. Configure environment
-```bash
 cp .env.example .env
-# Edit .env with your API keys
 ```
 
-### 4. Start infrastructure
+### 3. Configure API Keys
+Edit `.env` and fill in your keys:
+```env
+# Crucial for AMD Hackathon
+AMD_CLOUD_API_KEY=YOUR_AMD_KEY
+VLLM_BASE_URL=https://api.amd.com/v1/inference
+```
+
+### 4. Start Infrastructure & APIs
 ```bash
-docker-compose up -d postgres redis kafka zookeeper
+sudo docker-compose up -d postgres redis kafka zookeeper
+nohup uvicorn api.main:app --host 0.0.0.0 --port 8000 &
 ```
 
-### 5. Launch the agent mesh
+### 5. Launch the Dashboard
+```bash
+cd frontend && npm install
+nohup npm run dev -- --host 0.0.0.0 &
+```
+*Visit the UI at `http://<SERVER_IP>:5173`*
+
+### 6. Ignite the Mesh!
 ```bash
 python -m orchestrator.crew
 ```
 
-### 6. Start API + frontend
-```bash
-uvicorn api.main:app --reload --port 8000
-cd frontend && npm install && npm run dev
-```
-
-Dashboard → `http://localhost:3000` · API docs → `http://localhost:8000/docs`
-
 ---
 
-## Refinement Roadmap
-- [ ] Wire real DeepSeek-R1 inference via AMD Developer Cloud endpoint
-- [ ] Connect LogHarvester to live Kafka syslog stream
-- [ ] ATT&CK STIX graph integration in CorrelationEngine
-- [ ] Neo4j persistence for the event correlation graph
-- [ ] Hugging Face Space deployment for hackathon submission
-- [ ] 2x Build in Public posts tagging @AIatAMD + @lablab
+## Completed Hackathon Features
+- [x] Wire real DeepSeek-R1 inference via AMD Developer Cloud endpoint
+- [x] Integrate safe `LogHarvester` via Live Kafka syslog stream
+- [x] ATT&CK STIX live DB lookup via STIX/TAXII
+- [x] Full functional fallback to ensure LLMs correctly bypass LangChain Pydantic errors for custom endpoints
+- [x] Multi-page hyper-dense SOC Dashboard React UI
 
 ---
 

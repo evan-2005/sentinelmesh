@@ -458,3 +458,85 @@ body {
   from { opacity: 0; transform: translateY(5px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* THREAT GRAPH SEC */
+.graph-container {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-dim);
+  border-radius: 4px;
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.graph-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.node-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 1.2rem;
+  border: 2px solid var(--border-focus);
+  background-color: var(--bg-base);
+}
+
+.graph-node.external .node-icon { border-color: var(--system-amber); color: var(--system-amber); }
+.graph-node.compromised .node-icon { border-color: var(--system-red); color: var(--system-red); }
+.graph-node.target .node-icon { border-color: var(--system-cyan); color: var(--system-cyan); }
+
+.node-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  background-color: var(--bg-base);
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--border-dim);
+  border-radius: 4px;
+}
+
+.graph-edge {
+  width: 100px;
+  height: 2px;
+  background-color: var(--system-red);
+  position: relative;
+  margin-bottom: 2rem;
+  opacity: 0.7;
+}
+
+.graph-edge::after {
+  content: '▶';
+  position: absolute;
+  right: -5px;
+  top: -8px;
+  color: var(--system-red);
+  font-size: 14px;
+}
+
+.graph-intel {
+  width: 100%;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px dashed var(--border-focus);
+}
+
+.graph-intel p {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}

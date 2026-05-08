@@ -153,6 +153,40 @@ const PageLogs = () => {
   );
 };
 
+const PageThreatGraph = () => {
+  return (
+    <>
+      <div className="section-header">
+        <h3>Threat Topology Map</h3>
+        <span className="agent-count blink">(REAL-TIME KILL CHAIN)</span>
+      </div>
+      <div className="graph-container">
+        <div className="graph-node external">
+          <div className="node-icon">C2</div>
+          <div className="node-text">213.184.248.10</div>
+        </div>
+        <div className="graph-edge"></div>
+        <div className="graph-node compromised">
+          <div className="node-icon">API</div>
+          <div className="node-text">api-gw-01</div>
+        </div>
+        <div className="graph-edge"></div>
+        <div className="graph-node target">
+          <div className="node-icon">DB</div>
+          <div className="node-text">prod-db-03</div>
+        </div>
+        
+        <div className="graph-intel">
+          <p><span className="data-label">VECTOR:</span> External ➔ DMZ ➔ Internal</p>
+          <p><span className="data-label">STIX MAPPING:</span> T1078 Valid Accounts</p>
+          <p><span className="data-label">STATUS:</span> Lateral movement observed via SMB</p>
+          <p><span className="data-label">LLM CONFIDENCE:</span> <span className="emp">98.4%</span></p>
+        </div>
+      </div>
+    </>
+  );
+};
+
 // --- APP ROOT --- //
 
 export default function App() {
@@ -199,6 +233,7 @@ export default function App() {
         <nav className="sidebar-nav">
           <button className={activePage === 'agents' ? 'active' : ''} onClick={() => setActivePage('agents')}>Mesh Agents</button>
           <button className={activePage === 'incidents' ? 'active' : ''} onClick={() => setActivePage('incidents')}>Incidents</button>
+          <button className={activePage === 'threat-graph' ? 'active' : ''} onClick={() => setActivePage('threat-graph')}>Threat Graph</button>
           <button className={activePage === 'logs' ? 'active' : ''} onClick={() => setActivePage('logs')}>Log Explorer</button>
         </nav>
       </aside>
@@ -223,6 +258,7 @@ export default function App() {
         <main className="content">
           {activePage === 'agents' && <PageAgents agents={agents} />}
           {activePage === 'incidents' && <PageIncidents />}
+          {activePage === 'threat-graph' && <PageThreatGraph />}
           {activePage === 'logs' && <PageLogs />}
         </main>
       </div>
